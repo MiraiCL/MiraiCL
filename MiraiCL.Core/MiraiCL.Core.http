@@ -1,0 +1,6 @@
+@MiraiCL.Core_HostAddress = http://localhost:5151
+
+GET {{MiraiCL.Core_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
