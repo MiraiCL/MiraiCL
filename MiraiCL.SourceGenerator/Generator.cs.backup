@@ -1,0 +1,234 @@
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
+using System.Collections.Immutable;
+using System.Text;
+
+// 这个源生成器没有别的意思，就是单纯为了好玩 XD
+
+[Generator]
+public class AnalyzeGenerator : IIncrementalGenerator
+{
+    public void Initialize(IncrementalGeneratorInitializationContext context)
+    {
+        var compilationProvider = context.CompilationProvider;
+        
+        context.RegisterSourceOutput(compilationProvider, (sourceProductionContext, compilation) =>
+        {
+            int totalWarnings = 0;
+            
+            foreach (var syntaxTree in compilation.SyntaxTrees)
+            {
+                try
+                {
+                    var sourceText = syntaxTree.GetText(sourceProductionContext.CancellationToken);
+                    var fullSourceCode = sourceText.ToString();
+                    var filePath = syntaxTree.FilePath;
+                    var fileName = System.IO.Path.GetFileName(filePath);
+                    
+                    // 为每个文件生成大量警告
+                    var fileWarnings = GenerateMassiveWarningsForFile(
+                        sourceProductionContext, 
+                        fileName, 
+                        filePath, 
+                        fullSourceCode);
+                    
+                    totalWarnings += fileWarnings;
+                }
+                catch (Exception ex)
+                {
+                    sourceProductionContext.ReportDiagnostic(Diagnostic.Create(
+                        new DiagnosticDescriptor(
+                            "MiraiCLCodeAnalyzerAndGenerator",
+                            "源生成器错误",
+                            $"处理文件时出错: {ex.Message}",
+                            "CriticalFailure",
+                            DiagnosticSeverity.Warning,
+                            true),
+                        Location.None));
+                }
+            }
+            
+            // 生成最终的汇总警告
+            GenerateFinalWarnings(sourceProductionContext, totalWarnings, compilation.SyntaxTrees.Count());
+        });
+    }
+
+    private int GenerateMassiveWarningsForFile(SourceProductionContext context, string fileName, string filePath, string fullSourceCode)
+    {
+        int warningCount = 0;
+        var lines = fullSourceCode.Split('\n');
+        
+        // === 基础信息警告组 ===
+        warningCount += GenerateBasicInfoWarnings(context, fileName, filePath, fullSourceCode, lines);
+        
+        // === 逐行代码输出警告组 ===  
+        warningCount += GenerateLineByLineWarnings(context, fileName, lines);
+        
+        // === 代码分析警告组 ===
+        warningCount += GenerateCodeAnalysisWarnings(context, fileName, fullSourceCode);
+        
+        // === 随机检查警告组 ===
+        warningCount += GenerateRandomCheckWarnings(context, fileName, fullSourceCode);
+        
+        return warningCount;
+    }
+
+    private int GenerateBasicInfoWarnings(SourceProductionContext context, string fileName, string filePath, string fullSourceCode, string[] lines)
+    {
+        int count = 0;
+        
+        // 警告 1-10: 文件基础信息
+        context.ReportDiagnostic(CreateWarning($"MW_FILE_001", $"🚨 开始分析文件: {fileName}"));
+        context.ReportDiagnostic(CreateWarning($"MW_FILE_002", $"📁 完整路径: {filePath}"));
+        context.ReportDiagnostic(CreateWarning($"MW_FILE_003", $"📊 文件大小: {fullSourceCode.Length} 字符"));
+        context.ReportDiagnostic(CreateWarning($"MW_FILE_004", $"📈 总行数: {lines.Length} 行"));
+        context.ReportDiagnostic(CreateWarning($"MW_FILE_005", $"⏰ 分析时间: {DateTime.Now:HH:mm:ss.fff}"));
+        context.ReportDiagnostic(CreateWarning($"MW_FILE_006", $"📅 分析日期: {DateTime.Now:yyyy-MM-dd}"));
+        context.ReportDiagnostic(CreateWarning($"MW_FILE_007", $"🔢 文件哈希: {GetStringHash(fullSourceCode)}"));
+        context.ReportDiagnostic(CreateWarning($"MW_FILE_008", $"📝 文件编码: UTF-8"));
+        context.ReportDiagnostic(CreateWarning($"MW_FILE_009", $"📋 文件扩展名: {System.IO.Path.GetExtension(fileName)}"));
+        context.ReportDiagnostic(CreateWarning($"MW_FILE_010", $"🎯 分析状态: 进行中"));
+        
+        count += 10;
+        return count;
+    }
+
+    private int GenerateLineByLineWarnings(SourceProductionContext context, string fileName, string[] lines)
+    {
+        int count = 0;
+        
+        // 警告 11-...: 逐行输出代码（每行一个警告）
+        for (int i = 0; i < lines.Length; i++)
+        {
+            var lineNumber = i + 1;
+            var lineContent = lines[i].TrimEnd();
+            
+            if (!string.IsNullOrWhiteSpace(lineContent))
+            {
+                context.ReportDiagnostic(CreateWarning(
+                    $"MW_LINE_{lineNumber:0000}",
+                    $"📄 {fileName} 第 {lineNumber} 行: {EscapeWarningText(lineContent)}"));
+                count++;
+            }
+            else
+            {
+                context.ReportDiagnostic(CreateWarning(
+                    $"MW_EMPTY_{lineNumber:0000}", 
+                    $"⚪ {fileName} 第 {lineNumber} 行: [空行]"));
+                count++;
+            }
+            
+            // 每10行添加一个进度警告
+            if (lineNumber % 10 == 0)
+            {
+                context.ReportDiagnostic(CreateWarning(
+                    $"MW_PROG_{lineNumber:0000}",
+                    $"📦 {fileName} 处理进度: {lineNumber}/{lines.Length} 行 ({lineNumber * 100 / lines.Length}%)"));
+                count++;
+            }
+        }
+        
+        return count;
+    }
+
+    private int GenerateCodeAnalysisWarnings(SourceProductionContext context, string fileName, string fullSourceCode)
+    {
+        int count = 0;
+        
+        // 代码结构分析警告
+        var classes = System.Text.RegularExpressions.Regex.Matches(fullSourceCode, @"\bclass\s+\w+").Count;
+        var methods = System.Text.RegularExpressions.Regex.Matches(fullSourceCode, @"\b(public|private|protected|internal)\s+\w+\s+\w+\s*\(").Count;
+        var properties = System.Text.RegularExpressions.Regex.Matches(fullSourceCode, @"\b(public|private|protected|internal)\s+\w+\s+\w+\s*\{").Count;
+        var namespaces = System.Text.RegularExpressions.Regex.Matches(fullSourceCode, @"\bnamespace\s+\w+").Count;
+        var usingCount = System.Text.RegularExpressions.Regex.Matches(fullSourceCode, @"^using\s+\w+", System.Text.RegularExpressions.RegexOptions.Multiline).Count;
+        
+        context.ReportDiagnostic(CreateWarning($"MW_ANAL_001", $"🔍 {fileName} 代码分析开始"));
+        context.ReportDiagnostic(CreateWarning($"MW_ANAL_002", $"🏗️ {fileName} 包含 {classes} 个类"));
+        context.ReportDiagnostic(CreateWarning($"MW_ANAL_003", $"⚙️ {fileName} 包含 {methods} 个方法"));
+        context.ReportDiagnostic(CreateWarning($"MW_ANAL_004", $"📌 {fileName} 包含 {properties} 个属性"));
+        context.ReportDiagnostic(CreateWarning($"MW_ANAL_005", $"📦 {fileName} 包含 {namespaces} 个命名空间"));
+        context.ReportDiagnostic(CreateWarning($"MW_ANAL_006", $"🔗 {fileName} 包含 {usingCount} 个using指令"));
+        context.ReportDiagnostic(CreateWarning($"MW_ANAL_007", $"📊 {fileName} 代码密度: {(double)fullSourceCode.Replace("\n", "").Replace("\r", "").Replace(" ", "").Length / fullSourceCode.Length:P2}"));
+        context.ReportDiagnostic(CreateWarning($"MW_ANAL_008", $"📏 {fileName} 平均行长度: {fullSourceCode.Length / fullSourceCode.Split('\n').Length} 字符"));
+        context.ReportDiagnostic(CreateWarning($"MW_ANAL_009", $"🎯 {fileName} 分析完成"));
+        
+        count += 9;
+        return count;
+    }
+
+    private int GenerateRandomCheckWarnings(SourceProductionContext context, string fileName, string fullSourceCode)
+    {
+        int count = 0;
+        
+        // 随机检查警告
+        var checks = new[]
+        {
+            ("MW_CHECK_001", "✅ 代码格式检查通过"),
+            ("MW_CHECK_002", "✅ 语法验证通过"), 
+            ("MW_CHECK_003", "✅ 编码标准检查"),
+            ("MW_CHECK_004", "✅ 命名规范验证"),
+            ("MW_CHECK_005", "✅ 结构完整性检查"),
+            ("MW_CHECK_006", "🔍 潜在问题扫描"),
+            ("MW_CHECK_007", "📋 代码重复检查"),
+            ("MW_CHECK_008", "⚡ 性能建议检查"),
+            ("MW_CHECK_009", "🔒 安全扫描通过"),
+            ("MW_CHECK_010", "📝 文档完整性检查"),
+            ("MW_CHECK_011", "🎨 代码风格验证"),
+            ("MW_CHECK_012", "📐 架构一致性检查"),
+            ("MW_CHECK_013", "🔗 依赖关系分析"),
+            ("MW_CHECK_014", "📊 复杂度评估"),
+            ("MW_CHECK_015", "🚀 优化建议生成")
+        };
+        
+        foreach (var (id, message) in checks)
+        {
+            context.ReportDiagnostic(CreateWarning(id, $"{message} - {fileName}"));
+            count++;
+        }
+        
+        return count;
+    }
+
+    private void GenerateFinalWarnings(SourceProductionContext context, int totalWarnings, int fileCount)
+    {
+        // 最终汇总警告
+        context.ReportDiagnostic(CreateWarning("MW_FINAL_001", "🎉 ========== 源生成器分析完成 =========="));
+        context.ReportDiagnostic(CreateWarning("MW_FINAL_002", $"📋 总分析文件数: {fileCount}"));
+        context.ReportDiagnostic(CreateWarning("MW_FINAL_003", $"⚠️ 总生成警告数: {totalWarnings}"));
+        context.ReportDiagnostic(CreateWarning("MW_FINAL_004", $"📈 平均每文件警告: {totalWarnings / Math.Max(1, fileCount)}"));
+        context.ReportDiagnostic(CreateWarning("MW_FINAL_005", $"⏱️ 完成时间: {DateTime.Now:yyyy-MM-dd HH:mm:ss}"));
+        context.ReportDiagnostic(CreateWarning("MW_FINAL_006", "🔚 ========== 分析报告结束 =========="));
+        
+        for(var i = 0; i>= 0;i++){
+            context.ReportDiagnostic(CreateWarning("MW_FINAL_005","洛天依！！！！"));
+            context.ReportDiagnostic(CreateWarning("MW_FINAL_005","乐正绫！！！！"));
+            if(i/10 ==0) context.ReportDiagnostic(CreateWarning("MW_FINAL_005","洛天依！！！！乐正绫"));
+        }
+    }
+
+    private Diagnostic CreateWarning(string id, string message)
+    {
+        return Diagnostic.Create(
+            new DiagnosticDescriptor(
+                "MiraiCLCodeAnalyzerAndGenerator",
+                "代码分析（没有别的意思，就是为了好玩）",
+                message,
+                "MassiveWarning",
+                DiagnosticSeverity.Warning,
+                true),
+            Location.None);
+    }
+
+    private string EscapeWarningText(string text)
+    {
+        // 简化转义，确保警告文本不会破坏诊断格式
+        return text.Replace("{", "{{").Replace("}", "}}").Replace("\"", "\\\"");
+    }
+
+    private string GetStringHash(string input)
+    {
+        using var md5 = System.Security.Cryptography.MD5.Create();
+        var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(input));
+        return BitConverter.ToString(hash).Replace("-", "").Substring(0, 8).ToLower();
+    }
+}

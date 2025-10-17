@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:vm="using:MiraiCL.App.ViewModels.Pages.MainPage"
+             x:DataType="vm:MenuViewModel"
+             x:Class="MiraiCL.App.Views.Pages.MainPage.MenuView">
+    <UserControl.Styles>
+        <Style Selector="Button[Tag=Home]">
+            <Setter Property="Background" Value="#EE0000"/>
+        </Style>
+        <Style Selector="Button[Tag=Settings]">
+            <Setter Property="Background" Value="#EE0000"/>
+        </Style>
+        <Style Selector="Button[Tag=About]">
+            <Setter Property="Background" Value="#EE0000"/>
+        </Style>
+    </UserControl.Styles>
+
+    <StackPanel>
+        <Button Content="主页" Tag="Home" />
+        <Button Content="设置" Tag="Settings" />
+        <Button Content="关于" Tag="About"/>
+    </StackPanel>
+</UserControl>

@@ -51,11 +51,18 @@ public class Logger(LogOptions options) : IDisposable
     {
         get 
         {
+            if(!string.IsNullOrEmpty(_logPath)) return _logPath;
             for(var i = 0;i<16;i++)
             {
-                _logPath ??= Path.Combine(_option.LogBasePath,
-                        $"{DateTime.Now.Date}-{Random.Shared.Next()}.log");
-                if (!File.Exists(_logPath)) return _logPath;
+                _logPath = Path.Combine(_option.LogBasePath,
+                        $"{DateTime.Now.Date:yyyy-MM-dd}-{Random.Shared.Next()}.log");
+                
+
+
+                if (File.Exists(_logPath)) continue;
+                var dir = Path.GetDirectoryName(_logPath)!;
+                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+                return _logPath;
             }
 
             throw new OperationCanceledException("Cloud not found a valid path.");
@@ -101,6 +108,7 @@ public class Logger(LogOptions options) : IDisposable
                         _writedLogsize = 0;
                     }
                 }catch(Exception ex){
+                    Error(ex,"Logger","9");
                     OnLogFailed?.Invoke(ex);
                 }
             }
@@ -109,6 +117,8 @@ public class Logger(LogOptions options) : IDisposable
 
     private void _Log(string message,bool isErr = false)
     {
+        message = $"{DateTime.Now.ToString("HH:mm:ss.sss")} | {message}";
+
         if (_disposed) throw new InvalidOperationException("This logger already disposed.");
         lock(_lock){
             if(!_running && !_disposed) _StartLogThread();
