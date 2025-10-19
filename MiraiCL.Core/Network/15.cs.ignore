@@ -1,0 +1,730 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Net.Security;
+using System.Net.Sockets;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using System.Threading;
+using System.Threading.Channels;
+using System.Threading.Tasks;
+
+namespace MiraiCL.Core.Network;
+
+public enum IPAddressType // 修正命名规范
+{
+    V4, // 修正命名规范
+    V6  // 修正命名规范
+}
+
+public class HttpRequest
+{
+    public string? RemoteAddress { get; set; }
+    public string? RequestPath { get; set; }
+    public Version? HttpVersion { get; set; }
+    public Dictionary<string, string>? Headers { get; set; }
+    public Stream? ContentStream { get; set; }
+    public HttpMethod? Method { get; set; }
+    public Stream? ResponseStream { get; set; }
+}
+
+public class HttpResponse
+{
+    public int StatusCode { get; set; } = 200;
+    public Dictionary<string, string>? Headers { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+    public Stream? ResponseStream { get; set; }
+    public string? Description { get; set; } = "OK";
+}
+
+public class WebServer : IAsyncDisposable, IDisposable
+{
+    private readonly Dictionary<string, Func<HttpRequest, Task<HttpResponse>>> _routeHandlers = new(StringComparer.OrdinalIgnoreCase);
+    private readonly List<Socket> _listeningSockets = new();
+    private readonly Dictionary<string, SslServerAuthenticationOptions> _certificates = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Channel<Socket> _connectionChannel;
+    private readonly List<Task> _workerTasks = new();
+    private bool _isDisposed;
+    private CancellationTokenSource? _cancellationTokenSource;
+    private int _workerCount;
+
+    public bool EnableSslSupport { get; set; }
+    public int WorkerCount
+    {
+        get => _workerCount;
+        set
+        {
+            EnsureNotDisposed();
+            if (value < 1) throw new ArgumentOutOfRangeException(nameof(value), "Worker count must be at least 1");
+            _workerCount = value;
+        }
+    }
+
+    public Func<HttpRequest, Task<HttpResponse>> DefaultHandler { get; set; } = request =>
+    {
+        var content = "404 Not Found";
+        var stream = new MemoryStream(Encoding.UTF8.GetBytes(content), false);
+        return Task.FromResult(new HttpResponse
+        {
+            StatusCode = 404,
+            Description = "Not Found",
+            Headers = new(StringComparer.OrdinalIgnoreCase)
+            {
+                ["Server"] = "MiraiCLInternalServer",
+                ["Content-Type"] = "text/plain",
+                ["Content-Length"] = stream.Length.ToString()
+            },
+            ResponseStream = stream
+        });
+    };
+
+    public WebServer(int workerCount = 0)
+    {
+        _workerCount = workerCount > 0 ? workerCount : Environment.ProcessorCount;
+        _connectionChannel = Channel.CreateUnbounded<Socket>(new UnboundedChannelOptions
+        {
+            SingleReader = false,
+            SingleWriter = false,
+            AllowSynchronousContinuations = false
+        });
+    }
+
+    public void AddListener(IPEndPoint endPoint)
+    {
+        EnsureNotDisposed();
+
+        var socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp)
+        {
+            NoDelay = true
+        };
+        socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+
+        if (endPoint.AddressFamily == AddressFamily.InterNetworkV6)
+        {
+            socket.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IV6Only, true);
+        }
+
+        socket.Bind(endPoint);
+        socket.Listen(100);
+        _listeningSockets.Add(socket);
+
+        _ = AcceptConnectionsAsync(socket);
+    }
+
+    public void AddListener(string address, int port = 80, IPAddressType type = IPAddressType.V4)
+    {
+        EnsureNotDisposed();
+
+        var addressFamily = type == IPAddressType.V4
+            ? AddressFamily.InterNetwork
+            : AddressFamily.InterNetworkV6;
+
+        IPAddress ipAddress;
+        if (string.IsNullOrEmpty(address))
+        {
+            ipAddress = type == IPAddressType.V4 ? IPAddress.Any : IPAddress.IV6Any;
+        }
+        else if (!IPAddress.TryParse(address, out ipAddress!) || ipAddress.AddressFamily != addressFamily)
+        {
+            throw new ArgumentException($"Invalid {type} address: {address}");
+        }
+
+        var endPoint = new IPEndPoint(ipAddress, port);
+        AddListener(endPoint);
+    }
+
+    public void AddRoute(string method, string path, Func<HttpRequest, Task<HttpResponse>> handler)
+    {
+        EnsureNotDisposed();
+        ArgumentException.ThrowIfNullOrEmpty(method);
+        ArgumentException.ThrowIfNullOrEmpty(path);
+        ArgumentNullException.ThrowIfNull(handler);
+
+        _routeHandlers[$"{method.ToUpperInvariant()} {path}"] = handler;
+    }
+
+    public void AddSslCertificate(string address, int port, X509Certificate2 certificate)
+    {
+        EnsureNotDisposed();
+        ArgumentException.ThrowIfNullOrEmpty(address);
+        ArgumentNullException.ThrowIfNull(certificate);
+
+        var key = $"{address}:{port}";
+        _certificates[key] = new SslServerAuthenticationOptions
+        {
+            ServerCertificate = certificate,
+            EnabledSslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13,
+            ClientCertificateRequired = false,
+            CertificateRevocationCheckMode = X509RevocationMode.NoCheck
+        };
+    }
+
+    public void Start()
+    {
+        EnsureNotDisposed();
+
+        if (_cancellationTokenSource != null)
+            throw new InvalidOperationException("Server is already running");
+
+        _cancellationTokenSource = new CancellationTokenSource();
+
+        for (int i = 0; i < _workerCount; i++)
+        {
+            _workerTasks.Add(ProcessConnectionsAsync(i, _cancellationTokenSource.Token));
+        }
+    }
+
+    public async Task StopAsync()
+    {
+        if (_cancellationTokenSource == null) return;
+
+        _cancellationTokenSource.Cancel();
+
+        try
+        {
+            if (_workerTasks.Count > 0)
+            {
+                await Task.WhenAll(_workerTasks).ConfigureAwait(false);
+                _workerTasks.Clear();
+            }
+        }
+        finally
+        {
+            _connectionChannel.Writer.Complete();
+            _cancellationTokenSource.Dispose();
+            _cancellationTokenSource = null;
+        }
+    }
+
+    private async Task AcceptConnectionsAsync(Socket socket)
+    {
+        ArgumentNullException.ThrowIfNull(socket);
+
+        try
+        {
+            while (!_cancellationTokenSource?.IsCancellationRequested ?? false)
+            {
+                try
+                {
+                    var clientSocket = await socket.AcceptAsync(_cancellationTokenSource.Token)
+                        .ConfigureAwait(false);
+
+                    clientSocket.ReceiveTimeout = 30000;
+                    clientSocket.SendTimeout = 30000;
+
+                    await _connectionChannel.Writer.WriteAsync(clientSocket, _cancellationTokenSource.Token)
+                        .ConfigureAwait(false);
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error accepting connections: {ex.Message}");
+                    await Task.Delay(100, _cancellationTokenSource?.Token ?? CancellationToken.None)
+                        .ConfigureAwait(false);
+                }
+            }
+        }
+        finally
+        {
+            try { socket.Dispose(); }
+            catch (Exception ex) { Console.WriteLine($"Error disposing socket: {ex.Message}"); }
+        }
+    }
+
+    private async Task ProcessConnectionsAsync(int workerId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await foreach (var clientSocket in _connectionChannel.Reader.ReadAllAsync(cancellationToken)
+                .ConfigureAwait(false))
+            {
+                await ProcessClientAsync(clientSocket, cancellationToken).ConfigureAwait(false);
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            Console.WriteLine($"Worker {workerId} stopped gracefully");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Worker {workerId} error: {ex.Message}");
+        }
+    }
+
+    private async ValueTask ProcessClientAsync(Socket clientSocket, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(clientSocket);
+
+        try
+        {
+            using (clientSocket)
+            {
+                var networkStream = new NetworkStream(clientSocket, ownsSocket: false);
+                Stream stream = networkStream;
+
+                int firstByte = await ReadFirstByteAsync(networkStream, cancellationToken).ConfigureAwait(false);
+                if (firstByte == -1) return;
+
+                bool isSslRequest = firstByte == 0x16;
+
+                if (isSslRequest)
+                {
+                    if (!await HandleSslConnectionAsync(networkStream, clientSocket, cancellationToken)
+                        .ConfigureAwait(false))
+                        return;
+                    stream = networkStream; // after SSL, stream is SslStream, set below
+                }
+                else
+                {
+                    stream = new PrependStream(stream, (byte)firstByte);
+                }
+
+                await ParseAndProcessRequestAsync(stream, clientSocket, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Client processing error: {ex.Message}");
+        }
+    }
+
+    // 修正: 不再用ref参数, 而是返回(bool, Stream)元组
+    private async Task<(bool, Stream)> HandleSslConnectionAsync(NetworkStream networkStream, Socket clientSocket, CancellationToken cancellationToken)
+    {
+        if (!EnableSslSupport)
+        {
+            var response = CreateErrorResponse(400, "Bad Request", "SSL not supported");
+            await SendResponseAsync(networkStream, response, cancellationToken).ConfigureAwait(false);
+            return (false, networkStream);
+        }
+
+        if (clientSocket.LocalEndPoint is not IPEndPoint endPoint)
+        {
+            var response = CreateErrorResponse(500, "Internal Server Error", "Invalid endpoint");
+            await SendResponseAsync(networkStream, response, cancellationToken).ConfigureAwait(false);
+            return (false, networkStream);
+        }
+
+        var key = $"{endPoint.Address}:{endPoint.Port}";
+        if (!_certificates.TryGetValue(key, out var sslOptions))
+        {
+            var response = CreateErrorResponse(500, "Internal Server Error", "No certificate available");
+            await SendResponseAsync(networkStream, response, cancellationToken).ConfigureAwait(false);
+            return (false, networkStream);
+        }
+
+        var sslStream = new SslStream(networkStream, false);
+        try
+        {
+            await sslStream.AuthenticateAsServerAsync(sslOptions, cancellationToken).ConfigureAwait(false);
+            return (true, sslStream);
+        }
+        catch (AuthenticationException)
+        {
+            var response = CreateErrorResponse(403, "Forbidden", "SSL authentication failed");
+            await SendResponseAsync(networkStream, response, cancellationToken).ConfigureAwait(false);
+            return (false, networkStream);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"SSL handshake error: {ex.Message}");
+            var response = CreateErrorResponse(500, "Internal Server Error", "SSL handshake failed");
+            await SendResponseAsync(networkStream, response, cancellationToken).ConfigureAwait(false);
+            return (false, networkStream);
+        }
+    }
+
+    private async Task ParseAndProcessRequestAsync(Stream stream, Socket clientSocket, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(clientSocket);
+
+        var reader = new StreamReader(stream, Encoding.UTF8, false, 1024, true);
+
+        var request = new HttpRequest
+        {
+            RemoteAddress = clientSocket.RemoteEndPoint is IPEndPoint remoteEndPoint
+                ? remoteEndPoint.Address.ToString()
+                : "unknown",
+            ResponseStream = stream
+        };
+
+        try
+        {
+            string? requestLine = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+            if (string.IsNullOrEmpty(requestLine))
+            {
+                var response = CreateErrorResponse(400, "Bad Request", "Invalid request line");
+                await SendResponseAsync(request, response, cancellationToken).ConfigureAwait(false);
+                return;
+            }
+
+            var requestParts = requestLine.Split(new[] { ' ' }, 3, StringSplitOptions.RemoveEmptyEntries);
+            if (requestParts.Length != 3)
+            {
+                var response = CreateErrorResponse(400, "Bad Request", "Invalid request format");
+                await SendResponseAsync(request, response, cancellationToken).ConfigureAwait(false);
+                return;
+            }
+
+            request.Method = new HttpMethod(requestParts[0]);
+            request.RequestPath = requestParts[1];
+
+            if (Version.TryParse(requestParts[2].Split('/')[1], out var version))
+            {
+                request.HttpVersion = version;
+            }
+            else
+            {
+                request.HttpVersion = new Version(1, 1);
+            }
+
+            request.Headers = new(StringComparer.OrdinalIgnoreCase);
+            string? headerLine;
+            while (!string.IsNullOrEmpty(headerLine = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false)))
+            {
+                var colonIndex = headerLine.IndexOf(':');
+                if (colonIndex > 0 && colonIndex < headerLine.Length - 1)
+                {
+                    var key = headerLine[..colonIndex].Trim();
+                    var value = headerLine[(colonIndex + 1)..].Trim();
+
+                    if (!request.Headers.TryAdd(key, value)) // 简化为TryAdd
+                        request.Headers[key] = $"{request.Headers[key]}, {value}";
+                }
+            }
+
+            if (request.Headers.TryGetValue("Content-Length", out var contentLengthStr)
+                && long.TryParse(contentLengthStr, out var contentLength)
+                && contentLength > 0)
+            {
+                request.ContentStream = new LimitedStream(stream, contentLength);
+            }
+
+            var response = await GetResponseForRequestAsync(request, cancellationToken).ConfigureAwait(false);
+            await SendResponseAsync(request, response, cancellationToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error processing request: {ex.Message}");
+            var errorResponse = CreateErrorResponse(500, "Internal Server Error", "An unexpected error occurred");
+            await SendResponseAsync(request, errorResponse, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    private async Task<HttpResponse> GetResponseForRequestAsync(HttpRequest request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        if (request.Method != null && !string.IsNullOrEmpty(request.RequestPath))
+        {
+            var routeKey = $"{request.Method.Method} {request.RequestPath}";
+            if (_routeHandlers.TryGetValue(routeKey, out var handler))
+            {
+                return await handler(request).WaitAsync(cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        return await DefaultHandler(request).WaitAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task SendResponseAsync(HttpRequest request, HttpResponse response, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(response);
+
+        if (request.ResponseStream == null)
+            return;
+
+        try
+        {
+            await SendResponseAsync(request.ResponseStream, response, cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sending response: {ex.Message}");
+        }
+    }
+
+    private async Task SendResponseAsync(Stream responseStream, HttpResponse response, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(responseStream);
+        ArgumentNullException.ThrowIfNull(response);
+
+        response.Headers ??= new(StringComparer.OrdinalIgnoreCase);
+
+        if (!response.Headers.ContainsKey("Server"))
+            response.Headers["Server"] = "MiraiCLInternalServer";
+        if (!response.Headers.ContainsKey("Date"))
+            response.Headers["Date"] = DateTime.UtcNow.ToString("r");
+
+        if (response.ResponseStream != null)
+        {
+            if (!response.Headers.ContainsKey("Content-Length") && response.ResponseStream.CanSeek)
+            {
+                response.Headers["Content-Length"] = response.ResponseStream.Length.ToString();
+            }
+            else if (!response.Headers.ContainsKey("Transfer-Encoding"))
+            {
+                response.Headers["Transfer-Encoding"] = "chunked";
+            }
+            if (!response.Headers.ContainsKey("Content-Type"))
+            {
+                response.Headers["Content-Type"] = "application/octet-stream";
+            }
+        }
+
+        var statusLine = $"HTTP/1.1 {response.StatusCode} {response.Description}\r\n";
+        var statusBytes = Encoding.UTF8.GetBytes(statusLine);
+        await responseStream.WriteAsync(statusBytes, cancellationToken).ConfigureAwait(false);
+
+        foreach (var header in response.Headers)
+        {
+            var headerBytes = Encoding.UTF8.GetBytes($"{header.Key}: {header.Value}\r\n");
+            await responseStream.WriteAsync(headerBytes, cancellationToken).ConfigureAwait(false);
+        }
+
+        await responseStream.WriteAsync(Encoding.UTF8.GetBytes("\r\n"), cancellationToken).ConfigureAwait(false);
+
+        if (response.ResponseStream != null)
+        {
+            await response.ResponseStream.CopyToAsync(responseStream, cancellationToken).ConfigureAwait(false);
+            await responseStream.FlushAsync(cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    private HttpResponse CreateErrorResponse(int statusCode, string description, string content)
+    {
+        var stream = new MemoryStream(Encoding.UTF8.GetBytes(content), false);
+        return new HttpResponse
+        {
+            StatusCode = statusCode,
+            Description = description,
+            Headers = new(StringComparer.OrdinalIgnoreCase)
+            {
+                ["Content-Type"] = "text/plain",
+                ["Content-Length"] = stream.Length.ToString()
+            },
+            ResponseStream = stream
+        };
+    }
+
+    private async Task<int> ReadFirstByteAsync(Stream stream, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+
+        byte[] buffer = new byte[1];
+        int bytesRead = await stream.ReadAsync(buffer, 0, 1, cancellationToken).ConfigureAwait(false);
+        return bytesRead == 1 ? buffer[0] : -1;
+    }
+
+    private void EnsureNotDisposed()
+    {
+        if (_isDisposed)
+            throw new ObjectDisposedException(nameof(WebServer));
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_isDisposed)
+            return;
+
+        if (disposing)
+        {
+            _ = StopAsync();
+
+            foreach (var socket in _listeningSockets)
+            {
+                try { socket.Dispose(); }
+                catch { /* ignore */ }
+            }
+            _listeningSockets.Clear();
+        }
+
+        _isDisposed = true;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeAsyncCore().ConfigureAwait(false);
+        Dispose(false);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual async ValueTask DisposeAsyncCore()
+    {
+        if (!_isDisposed)
+        {
+            await StopAsync().ConfigureAwait(false);
+
+            foreach (var socket in _listeningSockets)
+            {
+                try { await socket.DisposeAsync().ConfigureAwait(false); }
+                catch { /* ignore */ }
+            }
+            _listeningSockets.Clear();
+
+            _isDisposed = true;
+        }
+    }
+
+    ~WebServer()
+    {
+        Dispose(false);
+    }
+
+    private sealed class PrependStream : Stream
+    {
+        private readonly Stream _baseStream;
+        private readonly byte[] _prependedData;
+        private int _prependedDataPosition;
+
+        public PrependStream(Stream baseStream, byte prependedByte)
+            : this(baseStream, new[] { prependedByte }) { }
+
+        private PrependStream(Stream baseStream, byte[] prependedData)
+        {
+            _baseStream = baseStream ?? throw new ArgumentNullException(nameof(baseStream));
+            _prependedData = prependedData ?? throw new ArgumentNullException(nameof(prependedData));
+            _prependedDataPosition = 0;
+        }
+
+        public override bool CanRead => _baseStream.CanRead;
+        public override bool CanSeek => false;
+        public override bool CanWrite => _baseStream.CanWrite;
+        public override long Length => throw new NotSupportedException();
+        public override long Position
+        {
+            get => throw new NotSupportedException();
+            set => throw new NotSupportedException();
+        }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            int bytesRead = 0;
+            if (_prependedDataPosition < _prependedData.Length)
+            {
+                int bytesToRead = Math.Min(count, _prependedData.Length - _prependedDataPosition);
+                Array.Copy(_prependedData, _prependedDataPosition, buffer, offset, bytesToRead);
+                _prependedDataPosition += bytesToRead;
+                bytesRead = bytesToRead;
+                offset += bytesToRead;
+                count -= bytesToRead;
+            }
+            if (count > 0)
+            {
+                bytesRead += _baseStream.Read(buffer, offset, count);
+            }
+            return bytesRead;
+        }
+
+        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            int bytesRead = 0;
+            if (_prependedDataPosition < _prependedData.Length)
+            {
+                int bytesToRead = Math.Min(count, _prependedData.Length - _prependedDataPosition);
+                Array.Copy(_prependedData, _prependedDataPosition, buffer, offset, bytesToRead);
+                _prependedDataPosition += bytesToRead;
+                bytesRead = bytesToRead;
+                offset += bytesToRead;
+                count -= bytesToRead;
+            }
+            if (count > 0)
+            {
+                bytesRead += await _baseStream.ReadAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
+            }
+            return bytesRead;
+        }
+
+        public override void Flush() => _baseStream.Flush();
+        public override Task FlushAsync(CancellationToken cancellationToken) => _baseStream.FlushAsync(cancellationToken);
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException();
+        public override void Write(byte[] buffer, int offset, int count) => _baseStream.Write(buffer, offset, count);
+        public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+            => _baseStream.WriteAsync(buffer, offset, count, cancellationToken);
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _baseStream.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        public override ValueTask DisposeAsync() => _baseStream.DisposeAsync();
+    }
+
+    private sealed class LimitedStream : Stream
+    {
+        private readonly Stream _baseStream;
+        private readonly long _maxLength;
+        private long _bytesRead;
+
+        public LimitedStream(Stream baseStream, long maxLength)
+        {
+            _baseStream = baseStream ?? throw new ArgumentNullException(nameof(baseStream));
+            _maxLength = maxLength > 0 ? maxLength : throw new ArgumentOutOfRangeException(nameof(maxLength));
+        }
+
+        public override bool CanRead => _baseStream.CanRead;
+        public override bool CanSeek => false;
+        public override bool CanWrite => false;
+        public override long Length => _maxLength;
+        public override long Position
+        {
+            get => _bytesRead;
+            set => throw new NotSupportedException();
+        }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            int bytesToRead = (int)Math.Min(count, _maxLength - _bytesRead);
+            if (bytesToRead <= 0)
+                return 0;
+
+            int bytesRead = _baseStream.Read(buffer, offset, bytesToRead);
+            _bytesRead += bytesRead;
+            return bytesRead;
+        }
+
+        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            int bytesToRead = (int)Math.Min(count, _maxLength - _bytesRead);
+            if (bytesToRead <= 0)
+                return 0;
+
+            int bytesRead = await _baseStream.ReadAsync(buffer, offset, bytesToRead, cancellationToken).ConfigureAwait(false);
+            _bytesRead += bytesRead;
+            return bytesRead;
+        }
+
+        public override void Flush() => _baseStream.Flush();
+        public override Task FlushAsync(CancellationToken cancellationToken) => _baseStream.FlushAsync(cancellationToken);
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException();
+        public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+        public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+            => throw new NotSupportedException();
+
+        public override ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    }
+}
