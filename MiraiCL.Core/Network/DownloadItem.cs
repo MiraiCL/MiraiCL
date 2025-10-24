@@ -72,7 +72,7 @@ public class DownloadItem:DownloadItemBase
                     if (DownloadSpeed < AllowMiniumSpeed) throw new TimeoutException("");
                     Array.Clear(buffer, 0, buffer.Length);
                 }
-                logger?.Info("Network",$"下载文件 {source} 完成，用时 {watcher.ElapsedMilliseconds/1000}s，平均速度：{}");
+                logger?.Info("Network",$"下载文件 {source} 完成，用时 {watcher.ElapsedMilliseconds/1000}s，平均速度：");
             }
             catch (TaskCanceledException ex)
             {

@@ -2,6 +2,37 @@
   "version": 3,
   "targets": {
     "net9.0": {
+      "keyring-dotnet/1.2.0": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/keyring-dotnet.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/keyring-dotnet.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/linux-x64/native/libskeychain.so": {
+            "assetType": "native",
+            "rid": "linux-x64"
+          },
+          "runtimes/osx-arm64/native/libskeychain.dylib": {
+            "assetType": "native",
+            "rid": "osx-arm64"
+          },
+          "runtimes/osx-x64/native/libskeychain.dylib": {
+            "assetType": "native",
+            "rid": "osx-x64"
+          },
+          "runtimes/win-x64/native/skeychain.dll": {
+            "assetType": "native",
+            "rid": "win-x64"
+          }
+        }
+      },
       "SharpCompress/0.41.0": {
         "type": "package",
         "dependencies": {
@@ -24,6 +55,47 @@
           "lib/netcoreapp2.1/_._": {}
         }
       },
+      "System.CodeDom/9.0.10": {
+        "type": "package",
+        "compile": {
+          "lib/net9.0/System.CodeDom.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net9.0/System.CodeDom.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
+      },
+      "System.Management/9.0.10": {
+        "type": "package",
+        "dependencies": {
+          "System.CodeDom": "9.0.10"
+        },
+        "compile": {
+          "lib/net9.0/System.Management.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net9.0/System.Management.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        },
+        "runtimeTargets": {
+          "runtimes/win/lib/net9.0/System.Management.dll": {
+            "assetType": "runtime",
+            "rid": "win"
+          }
+        }
+      },
       "ZstdSharp.Port/0.8.6": {
         "type": "package",
         "compile": {
@@ -36,6 +108,25 @@
     }
   },
   "libraries": {
+    "keyring-dotnet/1.2.0": {
+      "sha512": "nfdQpNKbRdJtYU+s/+ysnr57jdIwgnYxKukI2l2fUM8fIdkaWptNbHjskUU1JNvFsqyTuOmUF/dlUD2zYC3ujw==",
+      "type": "package",
+      "path": "keyring-dotnet/1.2.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.txt",
+        "README.md",
+        "keyring-dotnet.1.2.0.nupkg.sha512",
+        "keyring-dotnet.nuspec",
+        "lib/net8.0/keyring-dotnet.dll",
+        "lib/net8.0/keyring-dotnet.xml",
+        "runtimes/linux-x64/native/libskeychain.so",
+        "runtimes/osx-arm64/native/libskeychain.dylib",
+        "runtimes/osx-x64/native/libskeychain.dylib",
+        "runtimes/win-x64/native/skeychain.dll"
+      ]
+    },
     "SharpCompress/0.41.0": {
       "sha512": "z04dBVdTIAFTRKi38f0LkajaKA++bR+M8kYCbasXePILD2H+qs7CkLpyiippB24CSbTrWIgpBKm6BenZqkUwvw==",
       "type": "package",
@@ -73,6 +164,63 @@
         "system.buffers.nuspec"
       ]
     },
+    "System.CodeDom/9.0.10": {
+      "sha512": "00dAIR9Zx+F+AaipjaQmudX3VVpzYvT0bKVD3WcJq6om6pKNrldnp5bSR0VV6IlwDBa1HObGD+sTFaT/I9bBng==",
+      "type": "package",
+      "path": "system.codedom/9.0.10",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "PACKAGE.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/net461/System.CodeDom.targets",
+        "buildTransitive/net462/_._",
+        "buildTransitive/net8.0/_._",
+        "buildTransitive/netcoreapp2.0/System.CodeDom.targets",
+        "lib/net462/System.CodeDom.dll",
+        "lib/net462/System.CodeDom.xml",
+        "lib/net8.0/System.CodeDom.dll",
+        "lib/net8.0/System.CodeDom.xml",
+        "lib/net9.0/System.CodeDom.dll",
+        "lib/net9.0/System.CodeDom.xml",
+        "lib/netstandard2.0/System.CodeDom.dll",
+        "lib/netstandard2.0/System.CodeDom.xml",
+        "system.codedom.9.0.10.nupkg.sha512",
+        "system.codedom.nuspec",
+        "useSharedDesignerContext.txt"
+      ]
+    },
+    "System.Management/9.0.10": {
+      "sha512": "kJY2C6MjKSqfRkEnc8gn4Jth81Anrgxxpu0MffjEadfpp0Ll/gdGpYnDhRWZd+iFttkfZC0uCjFmCrZARRqq4w==",
+      "type": "package",
+      "path": "system.management/9.0.10",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "PACKAGE.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/net8.0/_._",
+        "buildTransitive/netcoreapp2.0/System.Management.targets",
+        "lib/net462/_._",
+        "lib/net8.0/System.Management.dll",
+        "lib/net8.0/System.Management.xml",
+        "lib/net9.0/System.Management.dll",
+        "lib/net9.0/System.Management.xml",
+        "lib/netstandard2.0/System.Management.dll",
+        "lib/netstandard2.0/System.Management.xml",
+        "runtimes/win/lib/net8.0/System.Management.dll",
+        "runtimes/win/lib/net8.0/System.Management.xml",
+        "runtimes/win/lib/net9.0/System.Management.dll",
+        "runtimes/win/lib/net9.0/System.Management.xml",
+        "system.management.9.0.10.nupkg.sha512",
+        "system.management.nuspec",
+        "useSharedDesignerContext.txt"
+      ]
+    },
     "ZstdSharp.Port/0.8.6": {
       "sha512": "iP4jVLQoQmUjMU88g1WObiNr6YKZGvh4aOXn3yOJsHqZsflwRsxZPcIBvNXgjXO3vQKSLctXGLTpcBPLnWPS8A==",
       "type": "package",
@@ -96,28 +244,25 @@
   },
   "projectFileDependencyGroups": {
     "net9.0": [
-      "SharpCompress >= 0.41.0"
+      "SharpCompress >= 0.41.0",
+      "System.Management >= 9.0.10",
+      "keyring-dotnet >= 1.2.0"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\wuliaodexiaoluo\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\LuoTianyi\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\ProgramData\\Ruollin\\MiraiCL\\MiraiCL.Core\\MiraiCL.Core.csproj",
+      "projectUniqueName": "d:\\project\\MiraiCL\\MiraiCL.Core\\MiraiCL.Core.csproj",
       "projectName": "MiraiCL.Core",
-      "projectPath": "C:\\ProgramData\\Ruollin\\MiraiCL\\MiraiCL.Core\\MiraiCL.Core.csproj",
-      "packagesPath": "C:\\Users\\wuliaodexiaoluo\\.nuget\\packages\\",
-      "outputPath": "C:\\ProgramData\\Ruollin\\MiraiCL\\MiraiCL.Core\\obj\\",
+      "projectPath": "d:\\project\\MiraiCL\\MiraiCL.Core\\MiraiCL.Core.csproj",
+      "packagesPath": "C:\\Users\\LuoTianyi\\.nuget\\packages\\",
+      "outputPath": "d:\\project\\MiraiCL\\MiraiCL.Core\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\wuliaodexiaoluo\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\LuoTianyi\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -125,9 +270,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "https://api.nuget.org/v3/index.json": {},
-        "https://mirrors.huaweicloud.com/repository/nuget/v3/index.json": {},
-        "https://nuget.cdn.azure.cn/v3/index.json": {}
+        "https://mirrors.huaweicloud.com/repository/nuget/v3/index.json": {}
       },
       "frameworks": {
         "net9.0": {
@@ -154,6 +297,14 @@
           "SharpCompress": {
             "target": "Package",
             "version": "[0.41.0, )"
+          },
+          "System.Management": {
+            "target": "Package",
+            "version": "[9.0.10, )"
+          },
+          "keyring-dotnet": {
+            "target": "Package",
+            "version": "[1.2.0, )"
           }
         },
         "imports": [
@@ -172,7 +323,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

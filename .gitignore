@@ -1,0 +1,10 @@
+# Build Output
+
+[Bb]in
+[Oo]bj
+
+*.txt
+*.log
+
+[Ll]og
+[Ll]ogs

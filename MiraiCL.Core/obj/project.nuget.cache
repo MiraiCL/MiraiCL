@@ -1,12 +1,15 @@
 {
   "version": 2,
-  "dgSpecHash": "RKjy5039Ot4=",
+  "dgSpecHash": "NzIDPXohm34=",
   "success": true,
-  "projectFilePath": "C:\\ProgramData\\Ruollin\\MiraiCL\\MiraiCL.Core\\MiraiCL.Core.csproj",
+  "projectFilePath": "d:\\project\\MiraiCL\\MiraiCL.Core\\MiraiCL.Core.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\wuliaodexiaoluo\\.nuget\\packages\\sharpcompress\\0.41.0\\sharpcompress.0.41.0.nupkg.sha512",
-    "C:\\Users\\wuliaodexiaoluo\\.nuget\\packages\\system.buffers\\4.6.0\\system.buffers.4.6.0.nupkg.sha512",
-    "C:\\Users\\wuliaodexiaoluo\\.nuget\\packages\\zstdsharp.port\\0.8.6\\zstdsharp.port.0.8.6.nupkg.sha512"
+    "C:\\Users\\LuoTianyi\\.nuget\\packages\\keyring-dotnet\\1.2.0\\keyring-dotnet.1.2.0.nupkg.sha512",
+    "C:\\Users\\LuoTianyi\\.nuget\\packages\\sharpcompress\\0.41.0\\sharpcompress.0.41.0.nupkg.sha512",
+    "C:\\Users\\LuoTianyi\\.nuget\\packages\\system.buffers\\4.6.0\\system.buffers.4.6.0.nupkg.sha512",
+    "C:\\Users\\LuoTianyi\\.nuget\\packages\\system.codedom\\9.0.10\\system.codedom.9.0.10.nupkg.sha512",
+    "C:\\Users\\LuoTianyi\\.nuget\\packages\\system.management\\9.0.10\\system.management.9.0.10.nupkg.sha512",
+    "C:\\Users\\LuoTianyi\\.nuget\\packages\\zstdsharp.port\\0.8.6\\zstdsharp.port.0.8.6.nupkg.sha512"
   ],
   "logs": []
 }

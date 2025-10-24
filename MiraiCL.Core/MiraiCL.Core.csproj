@@ -1,18 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0;net9.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="keyring-dotnet" Version="1.2.0" />
     <PackageReference Include="SharpCompress" Version="0.41.0" />
+    <PackageReference Include="System.Management" Version="9.0.10" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MiraiCL.SourceGenerator\MiraiCL.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Resources/windows-x64.zip" Condition="'$(RuntimeIdentifier)' == 'win-x64'" />
+  </ItemGroup>
 </Project>

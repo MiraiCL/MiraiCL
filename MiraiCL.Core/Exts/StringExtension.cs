@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-
+using System.Text;
 namespace MiraiCL.Core.Exts;
 
 public static class StringExtension{
@@ -13,4 +13,7 @@ public static class StringExtension{
         new HttpRequestMessage(method,uri);
 
     public static Uri ToURI(this string text) => new Uri(text);
+
+    public static byte[] GetBytes(this string text,Encoding? encode = null) => (encode ?? Encoding.UTF8).GetBytes(text);
+
 }

@@ -1,24 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\ProgramData\\Ruollin\\MiraiCL\\MiraiCL.App\\MiraiCL.App.csproj": {}
+    "d:\\project\\MiraiCL\\MiraiCL.App\\MiraiCL.App.csproj": {}
   },
   "projects": {
-    "C:\\ProgramData\\Ruollin\\MiraiCL\\MiraiCL.App\\MiraiCL.App.csproj": {
+    "d:\\project\\MiraiCL\\MiraiCL.App\\MiraiCL.App.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\ProgramData\\Ruollin\\MiraiCL\\MiraiCL.App\\MiraiCL.App.csproj",
+        "projectUniqueName": "d:\\project\\MiraiCL\\MiraiCL.App\\MiraiCL.App.csproj",
         "projectName": "MiraiCL.App",
-        "projectPath": "C:\\ProgramData\\Ruollin\\MiraiCL\\MiraiCL.App\\MiraiCL.App.csproj",
-        "packagesPath": "C:\\Users\\wuliaodexiaoluo\\.nuget\\packages\\",
-        "outputPath": "C:\\ProgramData\\Ruollin\\MiraiCL\\MiraiCL.App\\obj\\",
+        "projectPath": "d:\\project\\MiraiCL\\MiraiCL.App\\MiraiCL.App.csproj",
+        "packagesPath": "C:\\Users\\LuoTianyi\\.nuget\\packages\\",
+        "outputPath": "d:\\project\\MiraiCL\\MiraiCL.App\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\wuliaodexiaoluo\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\LuoTianyi\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -26,16 +22,14 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "https://api.nuget.org/v3/index.json": {},
-          "https://mirrors.huaweicloud.com/repository/nuget/v3/index.json": {},
-          "https://nuget.cdn.azure.cn/v3/index.json": {}
+          "https://mirrors.huaweicloud.com/repository/nuget/v3/index.json": {}
         },
         "frameworks": {
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "C:\\ProgramData\\Ruollin\\MiraiCL\\MiraiCL.Core\\MiraiCL.Core.csproj": {
-                "projectPath": "C:\\ProgramData\\Ruollin\\MiraiCL\\MiraiCL.Core\\MiraiCL.Core.csproj"
+              "d:\\project\\MiraiCL\\MiraiCL.Core\\MiraiCL.Core.csproj": {
+                "projectPath": "d:\\project\\MiraiCL\\MiraiCL.Core\\MiraiCL.Core.csproj"
               }
             }
           }
@@ -83,7 +77,7 @@
             "Microsoft.NET.ILLink.Tasks": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[9.0.8, )",
+              "version": "[9.0.10, )",
               "autoReferenced": true
             },
             "NAudio": {
@@ -107,7 +101,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
         }
       },
       "runtimes": {
@@ -116,21 +110,17 @@
         }
       }
     },
-    "C:\\ProgramData\\Ruollin\\MiraiCL\\MiraiCL.Core\\MiraiCL.Core.csproj": {
+    "d:\\project\\MiraiCL\\MiraiCL.Core\\MiraiCL.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\ProgramData\\Ruollin\\MiraiCL\\MiraiCL.Core\\MiraiCL.Core.csproj",
+        "projectUniqueName": "d:\\project\\MiraiCL\\MiraiCL.Core\\MiraiCL.Core.csproj",
         "projectName": "MiraiCL.Core",
-        "projectPath": "C:\\ProgramData\\Ruollin\\MiraiCL\\MiraiCL.Core\\MiraiCL.Core.csproj",
-        "packagesPath": "C:\\Users\\wuliaodexiaoluo\\.nuget\\packages\\",
-        "outputPath": "C:\\ProgramData\\Ruollin\\MiraiCL\\MiraiCL.Core\\obj\\",
+        "projectPath": "d:\\project\\MiraiCL\\MiraiCL.Core\\MiraiCL.Core.csproj",
+        "packagesPath": "C:\\Users\\LuoTianyi\\.nuget\\packages\\",
+        "outputPath": "d:\\project\\MiraiCL\\MiraiCL.Core\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\wuliaodexiaoluo\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\LuoTianyi\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -138,9 +128,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "https://api.nuget.org/v3/index.json": {},
-          "https://mirrors.huaweicloud.com/repository/nuget/v3/index.json": {},
-          "https://nuget.cdn.azure.cn/v3/index.json": {}
+          "https://mirrors.huaweicloud.com/repository/nuget/v3/index.json": {}
         },
         "frameworks": {
           "net9.0": {
@@ -167,6 +155,14 @@
             "SharpCompress": {
               "target": "Package",
               "version": "[0.41.0, )"
+            },
+            "System.Management": {
+              "target": "Package",
+              "version": "[9.0.10, )"
+            },
+            "keyring-dotnet": {
+              "target": "Package",
+              "version": "[1.2.0, )"
             }
           },
           "imports": [
@@ -185,7 +181,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

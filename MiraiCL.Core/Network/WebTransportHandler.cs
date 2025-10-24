@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Http.Headers;
 using MiraiCL.Core.Exts;
 
 namespace MiraiCL.Core.Network;
@@ -18,6 +19,7 @@ public class WebTransportHandler:DelegatingHandler
         {
             try
             {
+                
                 var response = await base.SendAsync(request, cancellationToken);
                 if ((int)response.StatusCode is >= 300 and <= 399 &&
                     response.StatusCode != HttpStatusCode.NotModified)
@@ -27,20 +29,21 @@ public class WebTransportHandler:DelegatingHandler
                     // https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Reference/Status/302
                     if((int)response.StatusCode == 302) req.Method = HttpMethod.Get;
                     var redirect = response.Headers.Location?.ToString();
-                    if(redirect.IsNullOrEmpty()) throw new WebException("Invalid redirect response,the location header must not null or empty.")
+                    if(redirect.IsNullOrEmpty()) throw new HttpRequestException("Invalid redirect response,the location header must not null or empty.");
                     req.RequestUri = 
                         redirect.StartsWith("http") ? new Uri(redirect) : new Uri(request.RequestUri!, redirect);
                     retryCount--;
                     redirectCount++;
                     continue;
                 }
-
                 return response;
             }
             catch (HttpRequestException ex)
             {
-                if (!AllowAutoRetry || retryCount == MaxRetry) throw new WebException("Make HttpRequest Failed.",ex);
+                if (!AllowAutoRetry || retryCount == MaxRetry) throw new HttpRequestException("Make HttpRequest Failed.",ex);
             }
+            
         }
+        throw new HttpRequestException();
     }
 }

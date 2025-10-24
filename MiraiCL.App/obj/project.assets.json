@@ -464,6 +464,37 @@
           }
         }
       },
+      "keyring-dotnet/1.2.0": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/keyring-dotnet.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/keyring-dotnet.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/linux-x64/native/libskeychain.so": {
+            "assetType": "native",
+            "rid": "linux-x64"
+          },
+          "runtimes/osx-arm64/native/libskeychain.dylib": {
+            "assetType": "native",
+            "rid": "osx-arm64"
+          },
+          "runtimes/osx-x64/native/libskeychain.dylib": {
+            "assetType": "native",
+            "rid": "osx-x64"
+          },
+          "runtimes/win-x64/native/skeychain.dll": {
+            "assetType": "native",
+            "rid": "win-x64"
+          }
+        }
+      },
       "MicroCom.Runtime/0.11.0": {
         "type": "package",
         "compile": {
@@ -473,7 +504,7 @@
           "lib/net5.0/MicroCom.Runtime.dll": {}
         }
       },
-      "Microsoft.NET.ILLink.Tasks/9.0.8": {
+      "Microsoft.NET.ILLink.Tasks/9.0.10": {
         "type": "package",
         "build": {
           "build/Microsoft.NET.ILLink.Tasks.props": {}
@@ -734,6 +765,22 @@
           "lib/netcoreapp2.1/_._": {}
         }
       },
+      "System.CodeDom/9.0.10": {
+        "type": "package",
+        "compile": {
+          "lib/net9.0/System.CodeDom.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net9.0/System.CodeDom.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
+      },
       "System.IO.Pipelines/8.0.0": {
         "type": "package",
         "compile": {
@@ -748,6 +795,31 @@
         },
         "build": {
           "buildTransitive/net6.0/_._": {}
+        }
+      },
+      "System.Management/9.0.10": {
+        "type": "package",
+        "dependencies": {
+          "System.CodeDom": "9.0.10"
+        },
+        "compile": {
+          "lib/net9.0/System.Management.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net9.0/System.Management.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        },
+        "runtimeTargets": {
+          "runtimes/win/lib/net9.0/System.Management.dll": {
+            "assetType": "runtime",
+            "rid": "win"
+          }
         }
       },
       "System.Security.AccessControl/4.7.0": {
@@ -821,7 +893,9 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
         "dependencies": {
-          "SharpCompress": "0.41.0"
+          "SharpCompress": "0.41.0",
+          "System.Management": "9.0.10",
+          "keyring-dotnet": "1.2.0"
         },
         "compile": {
           "bin/placeholder/MiraiCL.Core.dll": {}
@@ -1214,6 +1288,22 @@
           "runtimes/win-x64/native/libHarfBuzzSharp.dll": {}
         }
       },
+      "keyring-dotnet/1.2.0": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/keyring-dotnet.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/keyring-dotnet.dll": {
+            "related": ".xml"
+          }
+        },
+        "native": {
+          "runtimes/win-x64/native/skeychain.dll": {}
+        }
+      },
       "MicroCom.Runtime/0.11.0": {
         "type": "package",
         "compile": {
@@ -1223,7 +1313,7 @@
           "lib/net5.0/MicroCom.Runtime.dll": {}
         }
       },
-      "Microsoft.NET.ILLink.Tasks/9.0.8": {
+      "Microsoft.NET.ILLink.Tasks/9.0.10": {
         "type": "package",
         "build": {
           "build/Microsoft.NET.ILLink.Tasks.props": {}
@@ -1439,6 +1529,22 @@
           "lib/netcoreapp2.1/_._": {}
         }
       },
+      "System.CodeDom/9.0.10": {
+        "type": "package",
+        "compile": {
+          "lib/net9.0/System.CodeDom.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net9.0/System.CodeDom.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
+        }
+      },
       "System.IO.Pipelines/8.0.0": {
         "type": "package",
         "compile": {
@@ -1453,6 +1559,25 @@
         },
         "build": {
           "buildTransitive/net6.0/_._": {}
+        }
+      },
+      "System.Management/9.0.10": {
+        "type": "package",
+        "dependencies": {
+          "System.CodeDom": "9.0.10"
+        },
+        "compile": {
+          "lib/net9.0/System.Management.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "runtimes/win/lib/net9.0/System.Management.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net8.0/_._": {}
         }
       },
       "System.Security.AccessControl/4.7.0": {
@@ -1510,7 +1635,9 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
         "dependencies": {
-          "SharpCompress": "0.41.0"
+          "SharpCompress": "0.41.0",
+          "System.Management": "9.0.10",
+          "keyring-dotnet": "1.2.0"
         },
         "compile": {
           "bin/placeholder/MiraiCL.Core.dll": {}
@@ -2137,6 +2264,25 @@
         "runtimes/win-x86/native/libHarfBuzzSharp.dll"
       ]
     },
+    "keyring-dotnet/1.2.0": {
+      "sha512": "nfdQpNKbRdJtYU+s/+ysnr57jdIwgnYxKukI2l2fUM8fIdkaWptNbHjskUU1JNvFsqyTuOmUF/dlUD2zYC3ujw==",
+      "type": "package",
+      "path": "keyring-dotnet/1.2.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.txt",
+        "README.md",
+        "keyring-dotnet.1.2.0.nupkg.sha512",
+        "keyring-dotnet.nuspec",
+        "lib/net8.0/keyring-dotnet.dll",
+        "lib/net8.0/keyring-dotnet.xml",
+        "runtimes/linux-x64/native/libskeychain.so",
+        "runtimes/osx-arm64/native/libskeychain.dylib",
+        "runtimes/osx-x64/native/libskeychain.dylib",
+        "runtimes/win-x64/native/skeychain.dll"
+      ]
+    },
     "MicroCom.Runtime/0.11.0": {
       "sha512": "MEnrZ3UIiH40hjzMDsxrTyi8dtqB5ziv3iBeeU4bXsL/7NLSal9F1lZKpK+tfBRnUoDSdtcW3KufE4yhATOMCA==",
       "type": "package",
@@ -2150,10 +2296,10 @@
         "microcom.runtime.nuspec"
       ]
     },
-    "Microsoft.NET.ILLink.Tasks/9.0.8": {
-      "sha512": "rd1CbIsMtVPtZNTIVD6Xydue//klYOOQIDpRgu3BHtv17AlpRs74/6QFbcYgMm/jL+naVU2T3OFLxVSLV5lQLQ==",
+    "Microsoft.NET.ILLink.Tasks/9.0.10": {
+      "sha512": "sseaSJcBxKEpkc59hnB00b3NmJdGvJLfj74HK+nucHxERxbZSUREuWKjC9ywc+HdzJvJyiP2eiyEOROaGSfcPw==",
       "type": "package",
-      "path": "microsoft.net.illink.tasks/9.0.8",
+      "path": "microsoft.net.illink.tasks/9.0.10",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
@@ -2167,7 +2313,7 @@
         "build/Microsoft.NET.ILLink.Analyzers.props",
         "build/Microsoft.NET.ILLink.Tasks.props",
         "build/Microsoft.NET.ILLink.targets",
-        "microsoft.net.illink.tasks.9.0.8.nupkg.sha512",
+        "microsoft.net.illink.tasks.9.0.10.nupkg.sha512",
         "microsoft.net.illink.tasks.nuspec",
         "tools/net472/ILLink.Tasks.dll",
         "tools/net472/ILLink.Tasks.dll.config",
@@ -2574,6 +2720,34 @@
         "system.buffers.nuspec"
       ]
     },
+    "System.CodeDom/9.0.10": {
+      "sha512": "00dAIR9Zx+F+AaipjaQmudX3VVpzYvT0bKVD3WcJq6om6pKNrldnp5bSR0VV6IlwDBa1HObGD+sTFaT/I9bBng==",
+      "type": "package",
+      "path": "system.codedom/9.0.10",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "PACKAGE.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/net461/System.CodeDom.targets",
+        "buildTransitive/net462/_._",
+        "buildTransitive/net8.0/_._",
+        "buildTransitive/netcoreapp2.0/System.CodeDom.targets",
+        "lib/net462/System.CodeDom.dll",
+        "lib/net462/System.CodeDom.xml",
+        "lib/net8.0/System.CodeDom.dll",
+        "lib/net8.0/System.CodeDom.xml",
+        "lib/net9.0/System.CodeDom.dll",
+        "lib/net9.0/System.CodeDom.xml",
+        "lib/netstandard2.0/System.CodeDom.dll",
+        "lib/netstandard2.0/System.CodeDom.xml",
+        "system.codedom.9.0.10.nupkg.sha512",
+        "system.codedom.nuspec",
+        "useSharedDesignerContext.txt"
+      ]
+    },
     "System.IO.Pipelines/8.0.0": {
       "sha512": "FHNOatmUq0sqJOkTx+UF/9YK1f180cnW5FVqnQMvYUN0elp6wFzbtPSiqbo1/ru8ICp43JM1i7kKkk6GsNGHlA==",
       "type": "package",
@@ -2600,6 +2774,35 @@
         "lib/netstandard2.0/System.IO.Pipelines.xml",
         "system.io.pipelines.8.0.0.nupkg.sha512",
         "system.io.pipelines.nuspec",
+        "useSharedDesignerContext.txt"
+      ]
+    },
+    "System.Management/9.0.10": {
+      "sha512": "kJY2C6MjKSqfRkEnc8gn4Jth81Anrgxxpu0MffjEadfpp0Ll/gdGpYnDhRWZd+iFttkfZC0uCjFmCrZARRqq4w==",
+      "type": "package",
+      "path": "system.management/9.0.10",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "PACKAGE.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/net8.0/_._",
+        "buildTransitive/netcoreapp2.0/System.Management.targets",
+        "lib/net462/_._",
+        "lib/net8.0/System.Management.dll",
+        "lib/net8.0/System.Management.xml",
+        "lib/net9.0/System.Management.dll",
+        "lib/net9.0/System.Management.xml",
+        "lib/netstandard2.0/System.Management.dll",
+        "lib/netstandard2.0/System.Management.xml",
+        "runtimes/win/lib/net8.0/System.Management.dll",
+        "runtimes/win/lib/net8.0/System.Management.xml",
+        "runtimes/win/lib/net9.0/System.Management.dll",
+        "runtimes/win/lib/net9.0/System.Management.xml",
+        "system.management.9.0.10.nupkg.sha512",
+        "system.management.nuspec",
         "useSharedDesignerContext.txt"
       ]
     },
@@ -2752,30 +2955,25 @@
       "Avalonia.Fonts.Inter >= 11.3.6",
       "Avalonia.Themes.Fluent >= 11.3.6",
       "CommunityToolkit.Mvvm >= 8.2.1",
-      "Microsoft.NET.ILLink.Tasks >= 9.0.8",
+      "Microsoft.NET.ILLink.Tasks >= 9.0.10",
       "MiraiCL.Core >= 1.0.0",
       "NAudio >= 2.2.1"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\wuliaodexiaoluo\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\LuoTianyi\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\ProgramData\\Ruollin\\MiraiCL\\MiraiCL.App\\MiraiCL.App.csproj",
+      "projectUniqueName": "d:\\project\\MiraiCL\\MiraiCL.App\\MiraiCL.App.csproj",
       "projectName": "MiraiCL.App",
-      "projectPath": "C:\\ProgramData\\Ruollin\\MiraiCL\\MiraiCL.App\\MiraiCL.App.csproj",
-      "packagesPath": "C:\\Users\\wuliaodexiaoluo\\.nuget\\packages\\",
-      "outputPath": "C:\\ProgramData\\Ruollin\\MiraiCL\\MiraiCL.App\\obj\\",
+      "projectPath": "d:\\project\\MiraiCL\\MiraiCL.App\\MiraiCL.App.csproj",
+      "packagesPath": "C:\\Users\\LuoTianyi\\.nuget\\packages\\",
+      "outputPath": "d:\\project\\MiraiCL\\MiraiCL.App\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\wuliaodexiaoluo\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\LuoTianyi\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -2783,16 +2981,14 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "https://api.nuget.org/v3/index.json": {},
-        "https://mirrors.huaweicloud.com/repository/nuget/v3/index.json": {},
-        "https://nuget.cdn.azure.cn/v3/index.json": {}
+        "https://mirrors.huaweicloud.com/repository/nuget/v3/index.json": {}
       },
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "C:\\ProgramData\\Ruollin\\MiraiCL\\MiraiCL.Core\\MiraiCL.Core.csproj": {
-              "projectPath": "C:\\ProgramData\\Ruollin\\MiraiCL\\MiraiCL.Core\\MiraiCL.Core.csproj"
+            "d:\\project\\MiraiCL\\MiraiCL.Core\\MiraiCL.Core.csproj": {
+              "projectPath": "d:\\project\\MiraiCL\\MiraiCL.Core\\MiraiCL.Core.csproj"
             }
           }
         }
@@ -2840,7 +3036,7 @@
           "Microsoft.NET.ILLink.Tasks": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[9.0.8, )",
+            "version": "[9.0.10, )",
             "autoReferenced": true
           },
           "NAudio": {
@@ -2864,7 +3060,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
       }
     },
     "runtimes": {

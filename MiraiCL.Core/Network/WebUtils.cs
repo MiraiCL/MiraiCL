@@ -1,6 +1,4 @@
-
-
-
+using System.Text.Json.Nodes;
 using System.Net;
 using System.Net.Http.Headers;
 
@@ -23,19 +21,24 @@ public static class WebUtils
     };
 
     private static readonly HttpClient Client = new HttpClient(Handler);
+    
     public static async Task<string> GetStringRetryAsync(string uri,CancellationToken token) =>
         await Client.GetStringAsync(uri,token);
+    
+    public static async Task<string> GetStringRetryAsync(string uri) =>
+        await Client.GetStringAsync(uri);
+
 
     public static async Task<HttpResponseMessage> UploadContent(
         string host,
         HttpMethod method,
         CancellationToken token,
         HttpContent? content = null,
-        Dictionary<string,string>? Headers = null)
+        Dictionary<string,string>? headers = null)
     {
         using var request = new HttpRequestMessage(method, host);
         request.Content = content;
-        _ = Headers?.Any(kvp =>
+        _ = headers?.Any(kvp =>
         {
             if (!request.Headers.TryAddWithoutValidation(kvp.Key, kvp.Value))
                 request.Content?.Headers.TryAddWithoutValidation(kvp.Key, kvp.Value);
@@ -62,7 +65,16 @@ public static class WebUtils
         return await Client.SendAsync(request,HttpCompletionOption.ResponseHeadersRead,token??CancellationToken.None);
     }
 
-    
+    public static async Task<JsonNode?> GetJsonRetryAsync(string uri,CancellationToken token){
+        var response = await GetStringRetryAsync(uri,token);
+        return JsonNode.Parse(response);
+    }
+
+    public static async Task<JsonNode?> GetJsonRetryAsync(string uri){
+        var response = await GetStringRetryAsync(uri);
+        return JsonNode.Parse(response);
+    }
+
 }
 
 
