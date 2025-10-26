@@ -4,7 +4,7 @@ using MiraiCL.Core.Network;
 
 namespace MiraiCL.Core.Minecraft.Instance.Clients.Minecraft;
 
-public class MinecraftClient:IClient{
+public class MinecraftClient/*:IClient*/{
     private JsonNode? _versionJson;
     private JsonNode? _versionMeta;
     public Version? MinecraftVersion;
@@ -13,10 +13,11 @@ public class MinecraftClient:IClient{
             _versionJson = await McVersion.GetVersionMeta(version)
         };
     }
-
+    /*
     public static IClient[] ParseFromLocal(string jsonPath){
-
+        return [new MinecraftClient()]
     }
+    */
 
     public async Task<JsonNode?> GetJsonAsync(){
         ArgumentNullException.ThrowIfNull(MinecraftVersion);
@@ -25,7 +26,7 @@ public class MinecraftClient:IClient{
                 .GetJsonRetryAsync((_versionMeta ?? throw new VersionNotFoundException($"Require version {MinecraftVersion} is invalid or not found."))["url"]!.ToString());
         return _versionJson;    
     }
-
+/*
     public async Task<DownloadItem[]> AnalyzeLibrary(){
         var patches = _versionJson?["patches"];
         if(patches is not null){
@@ -33,8 +34,8 @@ public class MinecraftClient:IClient{
             for(var patch in patches)
         }
     }
-
-    public async Task<DownloadItem>
+*/
+    //public async Task<DownloadItem>
 
     public static int WriteLauncherProfile(string mcFolderPath){
         try{

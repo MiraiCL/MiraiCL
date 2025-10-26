@@ -3,12 +3,12 @@ using MiraiCL.Core.Network;
 
 namespace MiraiCL.Core.Utils;
 
-public class MCPing{
-    private ISocketTransport _transport;
+public class MCPing(string addr,ushort port){
+    private ISocketTransport? _transport;
 
-    public MCPing(string addr,ushort port){
-        _transport = new TcpTransport(addr, port);
+
+    public MCPingResult? Ping()
+    {
+        return null;
     }
-
-    public 
 }

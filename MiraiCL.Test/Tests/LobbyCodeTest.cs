@@ -1,4 +1,4 @@
-using MiraiCL.Core.LinkLobby;
+using MiraiCL.Core.LinkLobby.Scaffolding;
 
 namespace MiraiCL.Test.Tests;
 

@@ -1,3 +1,0 @@
-
-
-namespace MiraiCL.Core.LinkLobby;

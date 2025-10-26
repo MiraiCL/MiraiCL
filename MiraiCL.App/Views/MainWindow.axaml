@@ -10,6 +10,9 @@
         WindowStartupLocation="CenterScreen"
         Title="MiraiCL.App"
         Background="#66ccff"
+        Width="800"
+        Height="450"
+        ExtendClientAreaToDecorationsHint="True"
         DragDrop.AllowDrop="True">
 
     <Design.DataContext>

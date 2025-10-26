@@ -13,5 +13,5 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     public string? data;
     [ObservableProperty]
-    private UserControl? _models = new LocalCard();
+    private UserControl? _models = new MenuView();
 }

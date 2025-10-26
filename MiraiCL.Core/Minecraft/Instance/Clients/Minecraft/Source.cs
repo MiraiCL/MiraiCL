@@ -7,7 +7,7 @@ public static class DownloadSourcePolicy{
         VersionIndexV2 = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
         VersionIndex = "https://piston-meta.mojang.com/mc/game/version_manifest.json",
         MavenServer = "https://libraries.minecraft.net",
-        JavaIndexUrl = "https://piston-meta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json"
+        JavaIndexUrl = "https://piston-meta.mojang.com/v1/products/java-runtime/2ec0cc96c44e5a76b9c8b7c39df7210883d12871/all.json",
         AssetsServer = "https://resources.download.minecraft.net",
         SourceName = "Mojang"
     };

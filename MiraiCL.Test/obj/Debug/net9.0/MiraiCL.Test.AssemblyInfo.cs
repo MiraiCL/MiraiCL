@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MiraiCL.Test")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+395c5344aa5d095d046e50aebc5e0951aa1e850e")]
 [assembly: System.Reflection.AssemblyProductAttribute("MiraiCL.Test")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MiraiCL.Test")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
