@@ -1,0 +1,17 @@
+│   ├── log.txt
+│   │   │   ├── logger
+│   │   │   │   ├── log.rs
+│   │       └── log_test.rs
+│   │   │   │   ├── crc_catalog-2ae53367e6d2bf5d.d
+│   │   │   │   ├── crc_catalog-b604d8d9fc36ff1e.d
+│   │   │   │   ├── libcrc_catalog-2ae53367e6d2bf5d.rlib
+│   │   │   │   ├── libcrc_catalog-2ae53367e6d2bf5d.rmeta
+│   │   │   │   ├── libcrc_catalog-b604d8d9fc36ff1e.rmeta
+│   │   │   │   ├── liblog-51a21e8d0635f54b.rmeta
+│   │   │   │   ├── liblog-55fc345e32e908e5.rlib
+│   │   │   │   ├── liblog-55fc345e32e908e5.rmeta
+│   │   │   │   ├── liblog-cb2a9266f64aed0b.rlib
+│   │   │   │   ├── liblog-cb2a9266f64aed0b.rmeta
+│   │   │   │   ├── log-51a21e8d0635f54b.d
+│   │   │   │   ├── log-55fc345e32e908e5.d
+│   │   │   │   ├── log-cb2a9266f64aed0b.d

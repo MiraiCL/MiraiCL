@@ -1,11 +1,12 @@
-use tokio::{io::BufReader,fs::File};
-use zip::ZipArchive;
-use crate::core::io::file::{get_file_reader,get_file_writer};
+use crate::core::io::file::{get_file_reader, get_file_writer};
 use anyhow::Result;
+use tokio::{fs::File, io::BufReader};
+use zip::ZipArchive;
 
-pub struct ZipFile{
-    innerReader:ZipArchive<BufReader<File>>
+pub struct ZipFile {
+    innerReader: ZipArchive<BufReader<File>>,
 }
+/*
 
 impl ZipFile{
     async fn new(path:&str) -> Result<ZipFile>{
@@ -20,7 +21,7 @@ impl ZipFile{
 
     }
     fn compress(){
-        
+
     }
 
     fn get_entries(){
@@ -33,3 +34,5 @@ impl ZipFile{
 
     }
 }
+
+*/

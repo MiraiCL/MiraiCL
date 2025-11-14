@@ -18,7 +18,7 @@ pub fn assets_handler(request: Request<Vec<u8>>) -> Response<Vec<u8>> {
             .status(200)
             .body("{\"status\":200}".as_bytes().to_vec())
             .unwrap(),
-
+        /*
         "/loadFile" => match request.uri().query() {
             Some(query) => {
                 let query_map = form_urlencoded::parse(query.as_bytes())
@@ -31,6 +31,7 @@ pub fn assets_handler(request: Request<Vec<u8>>) -> Response<Vec<u8>> {
             }
             None => get_404_json(builder),
         },
+        */
         _ => get_404_json(builder),
     };
 }

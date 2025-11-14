@@ -1,10 +1,10 @@
-use crate::core::accounts::models::provider_trait::AuthenticationProvider
+use crate::core::accounts::models::provider_trait::AuthenticationProvider;
 
-pub struct MicrosoftProvider{
-    access_token:String,
-    refresh_token:String
+pub struct MicrosoftProvider {
+    access_token: String,
+    refresh_token: String,
 }
-
+/*
 impl AuthenticationProvider for MicrosoftProvider{
     fn new() -> MicrosoftProvider{
         MicrosoftProvider{
@@ -12,7 +12,7 @@ impl AuthenticationProvider for MicrosoftProvider{
             refresh_token:"sss".to_string()
         }
     }
-    
+
     async fn authenticate(self){
 
     }
@@ -22,10 +22,12 @@ impl AuthenticationProvider for MicrosoftProvider{
     }
 
     async fn validate(self) {
-        
+
     }
 
     async fn invalidate(self) {
-        
+
     }
 }
+
+    */

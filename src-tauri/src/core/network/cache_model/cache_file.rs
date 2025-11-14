@@ -1,7 +1,7 @@
-use serde::{Serialize,Deserialize};
+use serde::{Deserialize, Serialize};
 
-#[derive(Serialize,Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct CacheFile {
-    etag:String,
-    sha1:String
+    etag: String,
+    sha1: String,
 }
