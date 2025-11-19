@@ -18,3 +18,9 @@
 - 开放: 不满意设计？ Welcome PR!
 
 -->
+
+## 版权 | Copyright
+
+Copyright (c) 2025 Ruollin. All rights reserved.
+
+Source code licensed under the AGPL v3 License. See [LICENSE](./LICENSE) for details.
