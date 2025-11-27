@@ -1,26 +1,19 @@
-# MiraiCL - 下一代 Minecraft 启动器
+# README
 
->[!IMPORTANT]
->
-> 早期开发阶段，不代表成品效果
+## About
 
-<!--
-## 特点
+This is the official Wails Vue-TS template.
 
-- 完全免费：这是一个开源项目，不需要支付任何费用！
+You can configure the project by editing `wails.json`. More information about the project settings can be found
+here: https://wails.io/docs/reference/project-config
 
-- 新技术，新生活：MiraiCL 将支持更多技术以改善用户体验。
+## Live Development
 
-- 快速迁移：MiraiCL 允许在各个启动器之前进行档案迁移（只要支持）。
+To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
+server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
+and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
+to this in your browser, and you can call your Go code from devtools.
 
-- 咕了很久，但是稳（吗？）：这里时不时召开鸽子团建（x
+## Building
 
-- 开放: 不满意设计？ Welcome PR!
-
--->
-
-## 版权 | Copyright
-
-Copyright (c) 2025 [Ruollin](https://github.com/Ruollin). All rights reserved.
-
-Source code licensed under the AGPL v3 License. See [LICENSE](./LICENSE) for details.
+To build a redistributable, production mode package, use `wails build`.
