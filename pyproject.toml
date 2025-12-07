@@ -15,6 +15,16 @@ dependencies = [
     "pythonnet>=3.0.5",
 ]
 
+[dependency-groups]
+dev = ["MiraiCL"]
+
+[tool.uv.workspace]
+members = ["src-tauri"]
+
+[tool.uv.sources]
+MiraiCL = { workspace = true }
+
+
 [project.entry-points.pytauri]
 ext_mod = "tauri_app.ext_mod"
 
