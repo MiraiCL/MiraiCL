@@ -1,0 +1,10 @@
+pyproject.toml
+src-python/MiraiCL/__init__.py
+src-python/MiraiCL/__main__.py
+src-python/MiraiCL/py.typed
+src-python/MiraiCL.egg-info/PKG-INFO
+src-python/MiraiCL.egg-info/SOURCES.txt
+src-python/MiraiCL.egg-info/dependency_links.txt
+src-python/MiraiCL.egg-info/entry_points.txt
+src-python/MiraiCL.egg-info/requires.txt
+src-python/MiraiCL.egg-info/top_level.txt

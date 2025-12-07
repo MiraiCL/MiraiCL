@@ -1,0 +1,10 @@
+Metadata-Version: 2.4
+Name: MiraiCL
+Version: 0.1.0
+Summary: Add your description here
+Author: you
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: pytauri==0.8.*
+Requires-Dist: pydantic==2.*
+Requires-Dist: anyio==4.*

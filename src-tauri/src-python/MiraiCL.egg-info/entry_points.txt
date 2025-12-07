@@ -1,0 +1,2 @@
+[pytauri]
+ext_mod = MiraiCL.ext_mod
