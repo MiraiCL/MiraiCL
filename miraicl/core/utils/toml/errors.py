@@ -1,0 +1,2 @@
+class BadTomlException(Exception):
+    pass
