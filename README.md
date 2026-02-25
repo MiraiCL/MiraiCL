@@ -24,6 +24,6 @@
 
 ## 版权 | Copyright
 
-Copyright (c) 2025 [Ruollin](https://github.com/Ruollin). All rights reserved.
+Copyright (c) 2025 [LingYue412](https://github.com/LingYue412). All rights reserved.
 
 Source code licensed under the AGPL v3 License. See [LICENSE](./LICENSE) for details.
